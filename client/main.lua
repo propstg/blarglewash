@@ -2,8 +2,6 @@ ESX = nil
 
 local E_KEY = 38
 local DICT = "core"
-local PARTICLE = "water_cannon_jet"
-local PARTICLE2 = "water_cannon_spray"
 
 local isPurchased = {}
 
@@ -80,16 +78,17 @@ function purchaseWash(locationIndex)
     ESX.TriggerServerCallback('blarglewash:purchaseWash', function(isPurchaseSuccessful)
         if isPurchaseSuccessful then
             isPurchased[locationIndex] = true
-            playEffects(locationIndex)
 
             if Config.Price > 0 then
-                ESX.ShowHelpNotification(_U('pull_ahead_fee', Config.Price))
+                ESX.ShowNotification(_U('pull_ahead_fee', Config.Price))
             else
-                ESX.ShowHelpNotification(_U('pull_ahead_free'))
+                ESX.ShowNotification(_U('pull_ahead_free'))
             end
+
+            playEffects(locationIndex)
         else
             isPurchased[locationIndex] = false
-            ESX.ShowHelpNotification(_U('not_enough_money'))
+            ESX.ShowNotification(_U('not_enough_money'))
         end
 
         Citizen.Wait(5000)
@@ -119,24 +118,20 @@ end
 
 function playEffects(locationIndex)
     Citizen.CreateThread(function()
-        UseParticleFxAssetNextCall(DICT)
         local jets = Config.Locations[locationIndex].Jets
-        local particle = PARTICLE
-
-        if locationIndex == 1 or locationIndex == 2 then
-            particle = PARTICLE2
-        end
 
         local effects = {}
         for i = 1, #jets do
-            effects[i] = StartParticleFxLoopedAtCoord(particle, jets.x, jets.y, jets.z, jets.xRot, jets.yRot, jets.yRot, 1.0, false, false, false, false)
+            local jet = jets[i]
+            UseParticleFxAssetNextCall(DICT)
+            effects[i] = StartParticleFxLoopedAtCoord(Config.Particle, jet.x, jet.y, jet.z, jet.xRot, jet.yRot, jet.zRot, 1.0, false, false, false, false)
         end
 
         while isPurchased[locationIndex] do
             Citizen.Wait(100)
         end
 
-        for i = 1, #effects do
+        for i = 1, #jets do
             StopParticleFxLooped(effects[i], 0)
         end
     end)
