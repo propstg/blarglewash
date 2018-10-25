@@ -106,7 +106,7 @@ function handlePurchasedLocation(locationIndex)
         isPurchased[locationIndex] = false
 
         local vehicle = GetVehiclePedIsUsing(PlayerPedId())
-        WashDecalsFromVehicle(vehicle)
+        WashDecalsFromVehicle(vehicle, 1.0)
         SetVehicleDirtLevel(vehicle)
 
         ESX.ShowNotification(_U('wash_complete'))
