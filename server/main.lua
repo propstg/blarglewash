@@ -5,14 +5,14 @@ TriggerEvent('esx:getSharedObject', function(obj)
 end)
 
 ESX.RegisterServerCallback('blarglewash:purchaseWash', function(source, callback)
-    local xPlayer = ESX.GetPlayerFromId(source)
-
     if Config.Price > 0 then
-        if xPlayer.getMoney() < Config.Price then
+        local player = ESX.GetPlayerFromId(source)
+
+        if player.getMoney() < Config.Price then
             return callback(false)
         end
         
-        xPlayer.removeMoney(Config.Price)
+        player.removeMoney(Config.Price)
     end
 
     return callback(true)

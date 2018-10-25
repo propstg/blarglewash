@@ -1,9 +1,11 @@
 ESX = nil
 
 local E_KEY = 38
+local DICT = "core"
+local PARTICLE = "water_cannon_jet"
+local PARTICLE2 = "water_cannon_spray"
+
 local isPurchased = {}
-local dict = "core"
-local particle = "water_cannon_jet"
 
 Citizen.CreateThread(function ()
     while ESX == nil do
@@ -28,8 +30,8 @@ function initBlips()
 end
 
 function initSpray()
-    RequestNamedPtfxAsset(dict)
-    while not HasNamedPtfxAssetLoaded(dict) do
+    RequestNamedPtfxAsset(DICT)
+    while not HasNamedPtfxAssetLoaded(DICT) do
         Citizen.Wait(0)
     end
 end
@@ -76,34 +78,21 @@ end
 
 function purchaseWash(locationIndex)
     ESX.TriggerServerCallback('blarglewash:purchaseWash', function(isPurchaseSuccessful)
-        local message = ""
-
         if isPurchaseSuccessful then
             isPurchased[locationIndex] = true
+            playEffects(locationIndex)
 
             if Config.Price > 0 then
-                message = _U('pull_ahead_fee', Config.Price)
+                ESX.ShowHelpNotification(_U('pull_ahead_fee', Config.Price))
             else
-                message = _U('pull_ahead_free')
+                ESX.ShowHelpNotification(_U('pull_ahead_free'))
             end
         else
             isPurchased[locationIndex] = false
-            message = _U('not_enough_money')
+            ESX.ShowHelpNotification(_U('not_enough_money'))
         end
 
-	playEffects(locationIndex)
-        ESX.ShowNotification(message)
         Citizen.Wait(5000)
-    end)
-end
-
-function playEffects(locationIndex)
-    Citizen.CreateThread(function()
-        UseParticleFxAssetNextCall(dict)
-	local coords = Config.Locations[locationIndex].Exit
-        local pfx = StartParticleFxLoopedAtCoord(particle, coords.x, coords.y, coords.z, 0.0, 0.0, GetEntityHeading(PlayerPedId()), 1.0, false, false, false, false)
-	Citizen.Wait(10000)
-	StopParticleFxLooped(pfx, 0)
     end)
 end
 
@@ -126,4 +115,29 @@ end
 
 function drawCircle(coords, marker)
     DrawMarker(1, coords.x, coords.y, coords.z, 0, 0, 0, 0, 0, 0, marker.size, marker.size, marker.size, marker.r, marker.g, marker.b, 100, 0, 0, 2, 0, 0, 0, 0)
+end
+
+function playEffects(locationIndex)
+    Citizen.CreateThread(function()
+        UseParticleFxAssetNextCall(DICT)
+        local jets = Config.Locations[locationIndex].Jets
+        local particle = PARTICLE
+
+        if locationIndex == 1 or locationIndex == 2 then
+            particle = PARTICLE2
+        end
+
+        local effects = {}
+        for i = 1, #jets do
+            effects[i] = StartParticleFxLoopedAtCoord(particle, jets.x, jets.y, jets.z, jets.xRot, jets.yRot, jets.yRot, 1.0, false, false, false, false)
+        end
+
+        while isPurchased[locationIndex] do
+            Citizen.Wait(100)
+        end
+
+        for i = 1, #effects do
+            StopParticleFxLooped(effects[i], 0)
+        end
+    end)
 end
