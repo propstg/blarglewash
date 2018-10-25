@@ -2,6 +2,8 @@ ESX = nil
 
 local E_KEY = 38
 local isPurchased = {}
+local dict = "core"
+local particle = "water_cannon_jet"
 
 Citizen.CreateThread(function ()
     while ESX == nil do
@@ -10,6 +12,7 @@ Citizen.CreateThread(function ()
     end
 
     initBlips()
+    initSpray()
 end)
 
 function initBlips()
@@ -21,6 +24,13 @@ function initBlips()
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentString(_U('carwash_name'))
         EndTextCommandSetBlipName(blip)
+    end
+end
+
+function initSpray()
+    RequestNamedPtfxAsset(dict)
+    while not HasNamedPtfxAssetLoaded(dict) do
+        Citizen.Wait(0)
     end
 end
 
@@ -81,8 +91,19 @@ function purchaseWash(locationIndex)
             message = _U('not_enough_money')
         end
 
+	playEffects(locationIndex)
         ESX.ShowNotification(message)
         Citizen.Wait(5000)
+    end)
+end
+
+function playEffects(locationIndex)
+    Citizen.CreateThread(function()
+        UseParticleFxAssetNextCall(dict)
+	local coords = Config.Locations[locationIndex].Exit
+        local pfx = StartParticleFxLoopedAtCoord(particle, coords.x, coords.y, coords.z, 0.0, 0.0, GetEntityHeading(PlayerPedId()), 1.0, false, false, false, false)
+	Citizen.Wait(10000)
+	StopParticleFxLooped(pfx, 0)
     end)
 end
 
