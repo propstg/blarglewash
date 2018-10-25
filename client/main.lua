@@ -17,13 +17,15 @@ end)
 
 function initBlips()
     for i = 1, #Config.Locations do
-        local coords = Config.Locations[i].Entrance
-        local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
-        SetBlipSprite(blip, 100)
-        SetBlipAsShortRange(blip, true)
-        BeginTextCommandSetBlipName('STRING')
-        AddTextComponentString(_U('carwash_name'))
-        EndTextCommandSetBlipName(blip)
+        if Config.Locations[i].ShowBlip then
+            local coords = Config.Locations[i].Entrance
+            local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
+            SetBlipSprite(blip, 100)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentString(_U('carwash_name'))
+            EndTextCommandSetBlipName(blip)
+        end
     end
 end
 
@@ -61,7 +63,7 @@ function handleUnpurchasedLocation(locationIndex)
     
     drawCircle(coords, Config.Markers.Entrance)
 
-    if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), coords.x, coords.y, coords.z, true) < 5 then
+    if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), coords.x, coords.y, coords.z, true) < Config.Markers.Entrance.size then
         if Config.Price > 0 then
             ESX.ShowHelpNotification(_U('hint_fee', Config.Price))
         else
@@ -100,7 +102,7 @@ function handlePurchasedLocation(locationIndex)
     
     drawCircle(coords, Config.Markers.Exit)
 
-    if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), coords.x, coords.y, coords.z, true) < 5 then
+    if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
         isPurchased[locationIndex] = false
 
         local vehicle = GetVehiclePedIsUsing(PlayerPedId())
@@ -136,3 +138,12 @@ function playEffects(locationIndex)
         end
     end)
 end
+
+RegisterCommand('jet', function(source, args, raw)
+    Citizen.CreateThread(function()
+        UseParticleFxAssetNextCall(DICT)
+        local pfx = StartParticleFxLoopedAtCoord(Config.Particle, tonumber(args[1]), tonumber(args[2]), tonumber(args[3]), tonumber(args[4]), tonumber(args[5]), tonumber(args[6]), 1.0, false, false, false, false)
+        Citizen.Wait(5000)
+        StopParticleFxLooped(pfx, 0)
+    end)
+end, false)
