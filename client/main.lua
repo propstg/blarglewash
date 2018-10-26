@@ -127,7 +127,7 @@ local function handlePurchasedLocation(locationIndex, playerPed, vehicle)
     if GetDistanceBetweenCoords(GetEntityCoords(playerPed, coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
         isPurchased[locationIndex] = false
 
-        WashDecalsFromVehicle(vehicle)
+        WashDecalsFromVehicle(vehicle, 1.0)
         SetVehicleDirtLevel(vehicle)
 
         ESX.ShowNotification(_U('wash_complete'))
