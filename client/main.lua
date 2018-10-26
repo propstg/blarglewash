@@ -38,7 +38,7 @@ end
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(15)
+        Citizen.Wait(10)
 
         local playerPed = PlayerPedId()
 
@@ -47,7 +47,7 @@ Citizen.CreateThread(function()
                 handleLocation(i, playerPed)
             end
         else
-            Citizen.Wait(500)
+            Citizen.Wait(1000)
         end
     end
 end)
@@ -67,7 +67,7 @@ function handleUnpurchasedLocation(locationIndex, playerPed, vehicle)
     
     drawCircle(coords, Config.Markers.Entrance)
 
-    if GetDistanceBetweenCoords(GetEntityCoords(playerPed, coords.x, coords.y, coords.z, true) < Config.Markers.Entrance.size then
+    if GetDistanceBetweenCoords(GetEntityCoords(playerPed), coords.x, coords.y, coords.z, true) < Config.Markers.Entrance.size then
         if Config.Price > 0 then
             ESX.ShowHelpNotification(_U('hint_fee', Config.Price))
         else
@@ -102,29 +102,29 @@ function purchaseWash(locationIndex, vehicle)
     end)
 end
 
-local function makeCarReadyForWash(vehicle)
+function makeCarReadyForWash(vehicle)
     rollWindowsUp(vehicle)
     putConvertibleTopUpIfNeeded(vehicle)
 end
 
-local function rollWindowsUp(vehicle)
+function rollWindowsUp(vehicle)
     for i = 0, 3 do
         RollUpWindow(vehicle, i)
     end
 end
 
-local function putConvertibleTopUpIfNeeded(vehicle)
+function putConvertibleTopUpIfNeeded(vehicle)
     if IsVehicleAConvertible(vehicle, true) then
         RaiseConvertibleRoof(vehicle, false)
     end
 end
 
-local function handlePurchasedLocation(locationIndex, playerPed, vehicle)
+function handlePurchasedLocation(locationIndex, playerPed, vehicle)
     local coords = Config.Locations[locationIndex].Exit;
     
     drawCircle(coords, Config.Markers.Exit)
 
-    if GetDistanceBetweenCoords(GetEntityCoords(playerPed, coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
+    if GetDistanceBetweenCoords(GetEntityCoords(playerPed), coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
         isPurchased[locationIndex] = false
 
         WashDecalsFromVehicle(vehicle, 1.0)
@@ -135,11 +135,11 @@ local function handlePurchasedLocation(locationIndex, playerPed, vehicle)
     end
 end
 
-local function drawCircle(coords, marker)
+function drawCircle(coords, marker)
     DrawMarker(1, coords.x, coords.y, coords.z, 0, 0, 0, 0, 0, 0, marker.size, marker.size, marker.size, marker.r, marker.g, marker.b, 100, 0, 0, 2, 0, 0, 0, 0)
 end
 
-local function playEffects(locationIndex)
+function playEffects(locationIndex)
     Citizen.CreateThread(function()
         local jets = Config.Locations[locationIndex].Jets
 
