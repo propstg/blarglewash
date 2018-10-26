@@ -38,11 +38,13 @@ end
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(2)
+        Citizen.Wait(15)
 
-        if IsPedInAnyVehicle(PlayerPedId(), true) then
+        local playerPed = PlayerPedId()
+
+        if IsPedInAnyVehicle(playerPed, true) then
             for i = 1, #Config.Locations do
-                handleLocation(i)
+                handleLocation(i, playerPed)
             end
         else
             Citizen.Wait(500)
@@ -50,20 +52,22 @@ Citizen.CreateThread(function()
     end
 end)
 
-function handleLocation(locationIndex)
-    if isPurchased[locationIndex] then
-        handlePurchasedLocation(locationIndex)
+function handleLocation(locationIndex, playerPed)
+    local vehicle = GetVehiclePedIsUsing(playerPed)
+
+    if not isPurchased[locationIndex] then
+        handleUnpurchasedLocation(locationIndex, playerPed, vehicle)
     else
-        handleUnpurchasedLocation(locationIndex)
+        handlePurchasedLocation(locationIndex, playerPed, vehicle)
     end
 end
 
-function handleUnpurchasedLocation(locationIndex)
+function handleUnpurchasedLocation(locationIndex, playerPed, vehicle)
     local coords = Config.Locations[locationIndex].Entrance;
     
     drawCircle(coords, Config.Markers.Entrance)
 
-    if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), coords.x, coords.y, coords.z, true) < Config.Markers.Entrance.size then
+    if GetDistanceBetweenCoords(GetEntityCoords(playerPed, coords.x, coords.y, coords.z, true) < Config.Markers.Entrance.size then
         if Config.Price > 0 then
             ESX.ShowHelpNotification(_U('hint_fee', Config.Price))
         else
@@ -71,12 +75,12 @@ function handleUnpurchasedLocation(locationIndex)
         end
 
         if IsControlJustPressed(1, E_KEY) then
-            purchaseWash(locationIndex)
+            purchaseWash(locationIndex, vehicle)
         end
     end
 end
 
-function purchaseWash(locationIndex)
+function purchaseWash(locationIndex, vehicle)
     ESX.TriggerServerCallback('blarglewash:purchaseWash', function(isPurchaseSuccessful)
         if isPurchaseSuccessful then
             isPurchased[locationIndex] = true
@@ -87,6 +91,7 @@ function purchaseWash(locationIndex)
                 ESX.ShowNotification(_U('pull_ahead_free'))
             end
 
+            makeCarReadyForWash(vehicle)
             playEffects(locationIndex)
         else
             isPurchased[locationIndex] = false
@@ -97,15 +102,31 @@ function purchaseWash(locationIndex)
     end)
 end
 
-function handlePurchasedLocation(locationIndex)
+local function makeCarReadyForWash(vehicle)
+    rollWindowsUp(vehicle)
+    putConvertibleTopUpIfNeeded(vehicle)
+end
+
+local function rollWindowsUp(vehicle)
+    for i = 0, 3 do
+        RollUpWindow(vehicle, i)
+    end
+end
+
+local function putConvertibleTopUpIfNeeded(vehicle)
+    if IsVehicleAConvertible(vehicle, true) then
+        RaiseConvertibleRoof(vehicle, false)
+    end
+end
+
+local function handlePurchasedLocation(locationIndex, playerPed, vehicle)
     local coords = Config.Locations[locationIndex].Exit;
     
     drawCircle(coords, Config.Markers.Exit)
 
-    if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
+    if GetDistanceBetweenCoords(GetEntityCoords(playerPed, coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
         isPurchased[locationIndex] = false
 
-        local vehicle = GetVehiclePedIsUsing(PlayerPedId())
         WashDecalsFromVehicle(vehicle)
         SetVehicleDirtLevel(vehicle)
 
@@ -114,11 +135,11 @@ function handlePurchasedLocation(locationIndex)
     end
 end
 
-function drawCircle(coords, marker)
+local function drawCircle(coords, marker)
     DrawMarker(1, coords.x, coords.y, coords.z, 0, 0, 0, 0, 0, 0, marker.size, marker.size, marker.size, marker.r, marker.g, marker.b, 100, 0, 0, 2, 0, 0, 0, 0)
 end
 
-function playEffects(locationIndex)
+local function playEffects(locationIndex)
     Citizen.CreateThread(function()
         local jets = Config.Locations[locationIndex].Jets
 
