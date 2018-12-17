@@ -1,6 +1,7 @@
 Config = {}
 Config.Locale = 'en'
 Config.Price = 13
+Config.ParticleDictionary = 'core'
 Config.Particle = 'water_cannon_spray'
 
 Config.Markers = {
