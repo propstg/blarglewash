@@ -1,7 +1,7 @@
 Blips = {}
 
 function Blips.InitBlips()
-    for i = 1, #Config.Locations do
+    for _, coords in pairs(Config.Locations) do
         if coords.ShowBlip then
             local coords = coords.Entrance
             local blip = AddBlipForCoord(coords.x, coords.y, coords.z)

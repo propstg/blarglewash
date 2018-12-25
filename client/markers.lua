@@ -8,20 +8,21 @@ function Markers.StartMarkers()
         while true do
             Citizen.Wait(10)
     
-            for _, markerPosition in pairs(markerPositions) do
-                drawCircle(table.unpack(markerPosition))
+            for _, markerPosition in pairs(Markers.markerPositions) do
+                Markers.DrawCircle(markerPosition.coords, markerPosition.markerType)
             end
         end
     end)
 end
 
-function Marker.SetMarker(coords, markerType)
-    markerPositions = { {coords = coords, markerType = markerType} }
+function Markers.SetMarker(coords, markerType)
+    Markers.markerPositions = { {coords = coords, markerType = markerType} }
 end
 
 function Markers.ResetMarkers()
+    Markers.markerPositions = {}
     for _, location in pairs(Config.Locations) do
-        table.insert(markerPositions, {coords = location.Entrance, markerType = Config.Markers.Entrance})
+        table.insert(Markers.markerPositions, {coords = location.Entrance, markerType = Config.Markers.Entrance})
     end
 end
 

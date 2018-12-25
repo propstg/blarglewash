@@ -29,7 +29,7 @@ function startMainLoop()
             Citizen.Wait(1000)
         end
     end
-end)
+end
 
 function handleLocation(locationIndex, playerPed)
     local vehicle = GetVehiclePedIsUsing(playerPed)
@@ -99,7 +99,7 @@ end
 function handlePurchasedLocation(locationIndex, playerPed, vehicle)
     local coords = Config.Locations[locationIndex].Exit;
     
-    Marker.SetMarker(coords, Config.Markers.Exit)
+    Markers.SetMarker(coords, Config.Markers.Exit)
 
     if GetDistanceBetweenCoords(GetEntityCoords(playerPed), coords.x, coords.y, coords.z, true) < Config.Markers.Exit.size then
         isPurchased[locationIndex] = false
