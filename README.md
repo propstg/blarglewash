@@ -24,9 +24,9 @@ start blarglewash
 
 # Legal
 ### License
-blarglewash - NPC bikini wash
+blarglewash - automatic car washes
 
-Copyright (C) 2018 blarglebottoms
+Copyright (C) 2018 Gregory Propst
 
 This program Is free software: you can redistribute it And/Or modify it under the terms Of the GNU General Public License As published by the Free Software Foundation, either version 3 Of the License, Or (at your option) any later version.
 
