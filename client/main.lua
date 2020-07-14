@@ -26,31 +26,37 @@ Citizen.CreateThread(function ()
     Markers.StartMarkers()
     Blips.InitBlips()
     Animation.InitSpray()
+    gatherInformation()
     startMainLoop()
 end)
 
 function startGatherInformationLoop()
     while true do
-        playerPed = PlayerPedId()
-        playerCoords = GetEntityCoords(playerPed)
-
-        if IsPedInAnyVehicle(playerPed, true) then
-            playerVehicle = GetVehiclePedIsUsing(playerPed)
-
-            for i = 1, #Config.Locations do
-                local washCoords = Config.Locations[i].Entrance
-                entranceDistances[i] = GetDistanceBetweenCoords(playerCoords, washCoords.x, washCoords.y, washCoords.z, true)
-
-                if isPurchased[i] then
-                    local exitCoords = Config.Locations[i].Exit
-                    exitDistance = GetDistanceBetweenCoords(playerCoords, exitCoords.x, exitCoords.y, exitCoords.z, true)
-                end
-            end
-        else
-            playerVehicle = nil
-        end
-
+        gatherInformation()
         Citizen.Wait(100)
+    end
+end
+
+function gatherInformation()
+    playerPed = PlayerPedId()
+    playerCoords = GetEntityCoords(playerPed)
+
+    if IsPedInAnyVehicle(playerPed, true) then
+        playerVehicle = GetVehiclePedIsUsing(playerPed)
+
+        for i = 1, #Config.Locations do
+            local washCoords = Config.Locations[i].Entrance
+            entranceDistances[i] = GetDistanceBetweenCoords(playerCoords, washCoords.x, washCoords.y, washCoords.z, true)
+
+            if isPurchased[i] then
+                local exitCoords = Config.Locations[i].Exit
+                exitDistance = GetDistanceBetweenCoords(playerCoords, exitCoords.x, exitCoords.y, exitCoords.z, true)
+            end
+
+            Citizen.Wait(1)
+        end
+    else
+        playerVehicle = nil
     end
 end
 
@@ -105,6 +111,9 @@ function displayPurchaseMessage()
 end
 
 function purchaseWash(locationIndex)
+    local exitCoords = Config.Locations[locationIndex].Exit
+    exitDistance = GetDistanceBetweenCoords(playerCoords, exitCoords.x, exitCoords.y, exitCoords.z, true)
+
     ESX.TriggerServerCallback('blarglewash:purchaseWash', function(isPurchaseSuccessful)
         if isPurchaseSuccessful then
             isPurchased[locationIndex] = true
