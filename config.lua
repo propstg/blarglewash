@@ -7,6 +7,7 @@ Config.Particle = 'water_cannon_spray'
 Config.Markers = {
     Entrance = {size = 4.0, r = 0, g = 0, b = 200},
     Exit = {size = 4.0, r = 0, g = 0, b = 200},
+    DrawDistance = 50,
 }
 
 Config.Locations = {

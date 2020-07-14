@@ -2,28 +2,27 @@ Markers = {}
 Markers.markerPositions = {}
 
 function Markers.StartMarkers()
-    Markers.ResetMarkers()
-
     Citizen.CreateThread(function ()
         while true do
-            Citizen.Wait(10)
-    
-            for _, markerPosition in pairs(Markers.markerPositions) do
-                Markers.DrawCircle(markerPosition.coords, markerPosition.markerType)
+            if Markers.isPaused then
+                Citizen.Wait(1000)
+            else
+                Citizen.Wait(10)
+        
+                for _, markerPosition in pairs(Markers.markerPositions) do
+                    Markers.DrawCircle(markerPosition.coords, markerPosition.markerType)
+                end
             end
         end
     end)
 end
 
-function Markers.SetMarker(coords, markerType)
-    Markers.markerPositions = { {coords = coords, markerType = markerType} }
+function Markers.ClearMarkers()
+    Markers.markerPositions = {}
 end
 
-function Markers.ResetMarkers()
-    Markers.markerPositions = {}
-    for _, location in pairs(Config.Locations) do
-        table.insert(Markers.markerPositions, {coords = location.Entrance, markerType = Config.Markers.Entrance})
-    end
+function Markers.AddMarker(coords, markerType)
+    table.insert(Markers.markerPositions, {coords = coords, markerType = markerType})
 end
 
 function Markers.DrawCircle(coords, markerType)
