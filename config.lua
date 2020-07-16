@@ -5,8 +5,9 @@ Config.ParticleDictionary = 'core'
 Config.Particle = 'water_cannon_spray'
 
 Config.Markers = {
-    Entrance = {size = 4.0, r = 0, g = 0, b = 200},
-    Exit = {size = 4.0, r = 0, g = 0, b = 200},
+    Entrance = {size = 3.0, r = 0, g = 0, b = 200},
+    Exit = {size = 3.0, r = 0, g = 0, b = 200},
+    DrawDistance = 50,
 }
 
 Config.Locations = {
@@ -29,16 +30,6 @@ Config.Locations = {
     },
     {
         ShowBlip = true,
-        Entrance = {x = 164.01007, y = -1719.99414, z = 28.4686},
-        Exit =     {x = 172.20321, y = -1711.12109, z = 27.4667},
-        Jets = {
-            {x = 167.12083, y = -1717.68737, z = 31.0, xRot = -90.0, yRot = 0.0, zRot = 0.0},
-            {x = 169.18376, y = -1716.16857, z = 31.0, xRot = -90.0, yRot = 0.0, zRot = 45.0},
-            {x = 170.83013, y = -1713.98229, z = 31.0, xRot = -90.0, yRot = 0.0, zRot = 135.0},
-        }
-    },
-    {
-        ShowBlip = false,
         Entrance = {x = 167.23796, y = -1722.69775, z = 28.2916},
         Exit =     {x = 175.08970, y = -1713.64282, z = 28.2916},
         Jets = {
